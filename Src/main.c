@@ -157,16 +157,6 @@ int main(void)
     // irq are necessary for uart and gyroscope
 	// __disable_irq();
 
-    /*if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 1){
-            	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-            	//fire = 1;
-            	sprintf(algo_send_buf, "fire\r\n");
-            	HAL_UART_Transmit(&huart2,(uint8_t*)algo_send_buf,sizeof(algo_send_buf),0xFFFF);
-            	// after line with "fire" angles is for fire
-            }else{
-            	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
-            	//fire = 0;
-            }*/
 
 	if (shoot_info_ready) {
 
@@ -184,16 +174,14 @@ int main(void)
 
 			sprintf(shoot_send_buf, "angles: %.2f %.2f %.2f\r\n", roll,  pitch,  yaw);
 			HAL_UART_Transmit(&huart2,(uint8_t*)shoot_send_buf,sizeof(shoot_send_buf),0xFFFF);
-
-			//testing
-			/*float new_ax = MPU9255.AccelX*0.7 + MPU9255.GyroX *(1-0.7);
-			sprintf(shoot_send_buf, "raw: %.2f\r\n", new_ax);
-			HAL_UART_Transmit(&huart2,(uint8_t*)shoot_send_buf,sizeof(shoot_send_buf),0xFFFF);*/
-
 			//count = 0;
     	//}
     	//count++;
 		if (fire == 1) {
+			static char fire_send_buf[35];
+			sprintf(fire_send_buf, "fire: %.2f %.2f %.2f\r\n", roll,  pitch,  yaw);
+			HAL_UART_Transmit(&huart2,(uint8_t*)fire_send_buf,sizeof(fire_send_buf),0xFFFF);
+
 			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 			fire = 0;
 		}
@@ -590,7 +578,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : SENS2_EXTI3_Pin */
   GPIO_InitStruct.Pin = SENS2_EXTI3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(SENS2_EXTI3_GPIO_Port, &GPIO_InitStruct);
 
@@ -649,9 +637,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 		fire = 1;
 
-		static char fire_send_buf[35];
+		/*static char fire_send_buf[35];
 		sprintf(fire_send_buf, "fire\r\n");
-		HAL_UART_Transmit(&huart2,(uint8_t*)fire_send_buf,sizeof(fire_send_buf),0xFFFF);
+		HAL_UART_Transmit(&huart2,(uint8_t*)fire_send_buf,sizeof(fire_send_buf),0xFFFF);*/
 	}
 
 	if (GPIO_Pin == ButtonInternal_EXTI0_Pin) {
